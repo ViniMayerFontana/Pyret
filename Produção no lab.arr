@@ -3,32 +3,37 @@ include image
 include url("https://lucasalegre.github.io/pensamento-computacional/src/data/labs/chat-lib3.arr")
 
 
-
 # Exercício 1: Modelando Usuários, Mensagens e Chat
+
 data Usuario:
   | usuario(
       nome :: String,
       avatar :: Image,
-      online :: Boolean)
+      online :: Boolean
+      )
 end
 
 data Mensagem:
   | msg-texto(
       autor :: String,
       horario :: String,
-      texto :: String)
+      texto :: String
+      )
     
   | msg-imagem(
       autor :: String,
       horario :: String,
       imagem :: Image,
-      legenda :: String)
+      legenda :: String
+      )
 end
 
 data Chat:
   | chat(
       contato :: Usuario,
-      mensagens :: List<Mensagem>)
+      mensagens :: List<Mensagem>
+      )
+  
 end
 
 CONTATO-ANA :: Usuario = usuario("ana", circle(10, "solid", "orange"), true)
@@ -40,6 +45,7 @@ L1 = [list: MSG-TESTE-1, MSG-TESTE-2, MSG-TESTE-3]
 CHAT-TESTE :: Chat = chat(CONTATO-ANA, L1)
 
 
+
 fun cria-msg-tabela(id :: Number) -> Mensagem:
   doc: "Dado o ID de uma mensagem na tabela chat.csv, consulta a biblioteca e constrói a estrutura Mensagem correspondente (msg-texto ou msg-imagem)."
   if tipo-msg(id) == "texto":
@@ -49,8 +55,6 @@ fun cria-msg-tabela(id :: Number) -> Mensagem:
     msg-imagem(autor-msg(id), horario-msg(id), imagem-msg(id), legenda-msg(id))
   end
 end
-
-
 
 fun cria-historico-tabela(ids :: List<Number>) -> List<Mensagem>:
   doc: "Dada uma lista de IDs de mensagens da tabela online, constrói recursivamente a lista de estruturas Mensagem correspondentes."
@@ -66,7 +70,22 @@ CHAT-LONGO = chat(usuario("Ana", avatar-contato("Ana"), true), cria-historico-ta
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Exercício 2: Editando uma Mensagem
+
+
 fun edita-mensagem(m :: Mensagem, novo-texto :: String) -> Mensagem:
   doc: "Dada uma mensagem e um novo texto, devolve uma nova mensagem com o texto atualizado (se msg-texto) ou a legenda atualizada (se msg-imagem)."
   cases (Mensagem) m:
@@ -82,9 +101,8 @@ end
 
 
 
-
-
 # Exercício 3: Adicionando uma Mensagem em um Chat
+
 fun adiciona-no-fim(lista :: List<Mensagem>, m :: Mensagem) -> List<Mensagem>:
   doc: "Adiciona uma mensagem m no final de uma lista de mensagens."
 
@@ -94,15 +112,23 @@ fun adiciona-no-fim(lista :: List<Mensagem>, m :: Mensagem) -> List<Mensagem>:
   end
 
 where:
+  true is true
   adiciona-no-fim(L1, MSG-TESTE-2) is L1 + [list: MSG-TESTE-2]
 end
+
+
+
+
+
+
+
 
 
 fun adiciona-mensagem(c :: Chat, m :: Mensagem) -> Chat:
   doc: "Recebe um chat e uma nova mensagem m, e devolve um novo Chat com a mensagem adicionada ao final do histórico."
   chat(c.contato, adiciona-no-fim(c.mensagens, m))
 where:
-  adiciona-mensagem(CHAT-TESTE, MSG-TESTE-2) is chat(CHAT-TESTE.contato, adiciona-no-fim(CHAT-TESTE.mensagens, MSG-TESTE-2))
+  true is true
 end
 
 
@@ -110,41 +136,45 @@ end
 
 
 
-# Exercício 4: Editando uma Mensagem do Chat
 
-fun edita-por-horario(lista_mensagens :: List<Mensagem>, horario :: String, novo_texto :: String) -> List<Mensagem>:
+
+
+
+
+
+
+#| 
+    Exercício 4: Editando uma Mensagem do Chat
+|#
+
+fun edita-por-horario():
   doc: "Dada uma lista de mensagens, um horário e um novo texto, devolve a lista com a mensagem enviada nesse horário editada para o novo texto."
-  cases (List<Mensagem>) lista_mensagens:
-    |empty => empty
-    |link(f, r) => 
-      if f.horario == horario:
-        link(edita-mensagem(f, novo_texto), r)
-      else:
-        link(f, edita-por-horario(r, horario, novo_texto))
-      end
-  end  
+  # Se a lista for vazia, então [...]
+  # Senão:
+
+  empty
 where:
   true is true
-  edita-por-horario(L1, "12:40", "novo texto") is [list: edita-mensagem(MSG-TESTE-1, "novo texto"), MSG-TESTE-2, MSG-TESTE-3]
 end
 
-
-fun edita-chat(c :: Chat, horario :: String, novo_texto :: String) -> Chat:
+fun edita-chat():
   doc: "Dado um chat, um horário e um novo texto, devolve um novo Chat com a mensagem enviada nesse horário editada."
-  chat(c.contato, edita-por-horario(c.mensagens, horario, novo_texto))
+  # Complete!
+  0
 where:
   true is true
 end
 
+# Teste sua edição no CHAT-LONGO:
 # edita-chat(CHAT-LONGO, "09:01", "Bom dia Ana! Tudo ótimo e você?")
 # edita-chat(CHAT-LONGO, "09:05", "Saudades do Lab 1 de Truco!")
 
 
+#| 
+    Exercício 5: Desenhando um Chat
+|#
 
-
-
-
-# Exercício 5: Desenhando um Chat
+# --- Funções gráficas auxiliares (fornecidas prontas) ---
 
 fun desenha-avatar(u :: Usuario) -> Image:
   doc: "Dado um usuario, devolve a imagem do avatar com indicador de online (verde) ou offline (cinza)."
@@ -267,7 +297,7 @@ fun desenha-mensagens(mensagens :: List<Mensagem>) -> Image:
   doc: "Dada uma lista de mensagens, devolve uma imagem com todas as mensagens empilhadas verticalmente."
   cases (List<Mensagem>) mensagens:
     | empty => rectangle(1,1,"solid", "transparent")
-    | link(f, r) => above(desenha-mensagem(f), desenha-mensagens(r))
+    | link(f, r) => above(desenha-mensagem(f.mensagens), desenha-mensagens(r.mensagens))
   end
 end
 
@@ -276,4 +306,5 @@ fun desenha-chat(c :: Chat) -> Image:
   above(desenha-cabecalho(c.contato), desenha-mensagens(c.mensagens))
 end
 
-desenha-chat(CHAT-LONGO)
+# Descomente para visualizar seus chats montados:
+# desenha-chat(CHAT-LONGO)
